@@ -1,4 +1,4 @@
-# MSITM_EmergingTech
+# MSITM Emerging Technologies - MIS 285N | Fall 2021
 
 #### Group 4 Project Milestone 1  
 
