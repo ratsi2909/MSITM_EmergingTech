@@ -4,6 +4,10 @@
 # In[ ]:
 
 
+#basic step counter
+#on pressing button A - reset step count
+#on a certain threshold - print message hurray
+
 def on_button_pressed_a():
     global steps
     steps = 0
