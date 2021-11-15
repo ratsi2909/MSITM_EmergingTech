@@ -1,0 +1,25 @@
+@startuml Microbit to Android
+title Microbit to Android
+actor "User" as U
+participant "Microbit" as M
+
+box "Raspberry Pi"
+participant "Client" as PC
+end box
+
+box "Android Application" #SkyBlue
+participant "Client\n Group4" as AC
+participant "Broker\n(192.168.4.14)" as AB
+end box
+
+PC->AB: MQTT: Connect
+AC->AB: MQTT: Connect
+AC->AB: MQTT: Subscribe\n (testTopic2)
+
+U->M: Steps
+M->M: Increment steps\n count
+U->M: Trigger button
+M->PC: BLE: Advertise \nstep count
+PC->AB: MQTT: Publish step\n count (testTopic2)
+AB->AC: MQTT: Step count
+@enduml
