@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.widget.Button
 import android.widget.TextView
+import android.widget.ImageView
+import com.squareup.picasso.Picasso
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
@@ -26,6 +28,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var queue: RequestQueue
     lateinit var gson: Gson
     lateinit var mostRecentWeatherResult: WeatherResult
+    lateinit var getIcon: WeatherResult
 
     lateinit var weatherresult: String
 
@@ -49,6 +52,7 @@ class MainActivity : AppCompatActivity() {
         retrieveButton = this.findViewById(R.id.retrieveButton)
         syncButton = this.findViewById(R.id.syncButton)
 
+
         // when the user presses the syncbutton, this method will get called
         syncButton.setOnClickListener({ syncWithPi() })
 
@@ -61,12 +65,12 @@ class MainActivity : AppCompatActivity() {
             // when the client is successfully connected to the broker, this method gets called
             override fun connectComplete(reconnect: Boolean, serverURI: String?) {
                 println("Connection Complete!!")
-                println("+++++++ PRINT WEATHER RESULT IN MQTT...")
-                println(weatherresult)
+//                println("+++++++ PRINT WEATHER RESULT IN MQTT...")
+//                println(weatherresult)
                 // this subscribes the client to the subscribe topic
                 mqttAndroidClient.subscribe(subscribeTopic, 0)
                 val message = MqttMessage()
-                message.payload = weatherresult.toByteArray()
+                message.payload = ("Hello World").toByteArray()
 
                 // this publishes a message to the publish topic
                 mqttAndroidClient.publish(publishTopic, message)
@@ -97,17 +101,25 @@ class MainActivity : AppCompatActivity() {
     fun requestWeather(){
         val url = StringBuilder("https://api.openweathermap.org/data/2.5/weather?id=4254010&appid=ea9d4a9da52aaa9920a1f1ab27e0086e").toString()
         val stringRequest = object : StringRequest(com.android.volley.Request.Method.GET, url,
-                com.android.volley.Response.Listener<String> { response ->
-                    //textView.text = response
-                    mostRecentWeatherResult = gson.fromJson(response, WeatherResult::class.java)
-                    textView.text = mostRecentWeatherResult.weather.get(0).main
-                    //get result into a variable in addition to text view
-                    weatherresult = mostRecentWeatherResult.weather.get(0).main
-                    println("+++++++ PRINT WEATHER RESULT...")
-                    println(weatherresult)
-                    
-                },
-                com.android.volley.Response.ErrorListener { println("******That didn't work!") }) {}
+            com.android.volley.Response.Listener<String> { response ->
+                //textView.text = response
+                mostRecentWeatherResult = gson.fromJson(response, WeatherResult::class.java)
+                textView.text = mostRecentWeatherResult.weather.get(0).main
+                weatherresult = mostRecentWeatherResult.weather.get(0).main
+                println("+++++++ PRINT WEATHER RESULT...")
+                println(weatherresult)
+                println("+++++++ getting icon...")
+                getIcon = gson.fromJson(response, WeatherResult::class.java)
+                val icon = getIcon.weather.get(0).icon
+
+                val iconUrl = "https://openweathermap.org/img/w/$icon.png"
+                println(iconUrl)
+
+                //print icon in image view
+                val imageView: ImageView = this.findViewById(R.id.image_view)
+                Picasso.with(this).load(iconUrl).into(imageView)
+            },
+            com.android.volley.Response.ErrorListener { println("******That didn't work!") }) {}
         // Add the request to the RequestQueue.
         queue.add(stringRequest)
     }
